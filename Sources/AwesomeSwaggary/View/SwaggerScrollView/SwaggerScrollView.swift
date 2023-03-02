@@ -8,7 +8,7 @@
 import SwiftUI
 
 @available(iOS 16.0, *)
-struct SwaggerScrollView<Content: View>: View {
+public struct SwaggerScrollView<Content: View>: View {
   
   var axes: Axis.Set = [.vertical]
   var showsIndicators = true
@@ -18,6 +18,10 @@ struct SwaggerScrollView<Content: View>: View {
   @ViewBuilder var content: () -> Content
   
   var scrollAction: ((_ offset: CGPoint, _ maxOffset: CGPoint) -> Void)?
+  
+  public init(axes: Axis.Set = [.vertical], showsIndicators: Bool = true,  content: @escaping () -> Content) {
+    self.content = content
+  }
   
   var offset: CGPoint {
     .init(x: -currentContentFrame.origin.x, y: -currentContentFrame.origin.y)
@@ -30,18 +34,21 @@ struct SwaggerScrollView<Content: View>: View {
     )
   }
   
-  var body: some View {
+  private let coordinateSpaceName = UUID()
+  
+  public var body: some View {
     ScrollView(axes, showsIndicators: showsIndicators) {
       content()
-        .frameChanged { rect in
+        .frameChanged(coordinateSpace: .named(coordinateSpaceName)) { rect in
           currentContentFrame = rect
           scrollAction?(offset, maxOffset)
         }
     }
+    .coordinateSpace(name: coordinateSpaceName)
     .padding([.top, .bottom], 1) // this will prevent the scrollview to extend under the safe area
     .frame(minHeight: 0, maxHeight: currentContentFrame.height)
     .scrollDisabled(currentContentFrame.height <= currentFrame.height )
-    .frameChanged { rect in
+    .frameChanged(coordinateSpace: .local) { rect in
       currentFrame = rect
     }
   }
@@ -49,7 +56,7 @@ struct SwaggerScrollView<Content: View>: View {
 
 @available(iOS 16.0, *)
 extension SwaggerScrollView {
-  func onScroll(perform action: @escaping ((_ offset: CGPoint, _ maxOffset: CGPoint) -> Void)) -> Self {
+  public func onScroll(perform action: @escaping ((_ offset: CGPoint, _ maxOffset: CGPoint) -> Void)) -> Self {
     var copy = self
     copy.scrollAction = action
     return copy

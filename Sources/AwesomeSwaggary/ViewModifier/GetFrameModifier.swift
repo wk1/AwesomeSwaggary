@@ -11,6 +11,7 @@ import SwiftUI
 struct GetFrameViewModifier: ViewModifier {
   
   var onChange: ((_ rect: CGRect) -> Void)
+  var coordinateSpace: CoordinateSpace
   
   func body(content: Content) -> some View {
     content
@@ -18,7 +19,7 @@ struct GetFrameViewModifier: ViewModifier {
         GeometryReader { geo in
           Color.clear.preference(
             key: FramePreferenceKey.self,
-            value: geo.frame(in: .local)
+            value: geo.frame(in: coordinateSpace)
           )
         }
       )
@@ -42,10 +43,11 @@ private extension GetFrameViewModifier {
 @available(iOS 13.0, *)
 public extension View {
   func frameChanged(
+    coordinateSpace: CoordinateSpace = .global,
     onChange: @escaping ((_ rect: CGRect) -> Void)
   ) -> some View {
     modifier(
-      GetFrameViewModifier(onChange: onChange)
+      GetFrameViewModifier(onChange: onChange, coordinateSpace: coordinateSpace)
     )
   }
 }
