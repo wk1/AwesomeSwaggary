@@ -49,7 +49,7 @@ public struct SwaggerScrollView<Content: View>: View {
     .clipped() // this will prevent the scrollview to extend under the safe area
     .frame(minHeight: 0, maxHeight: currentContentFrame.height)
     .scrollDisabled(currentContentFrame.height <= currentFrame.height )
-    .frameChanged(coordinateSpace: .local) { rect in
+    .frameChanged(coordinateSpace: .named(coordinateSpaceName)) { rect in
       currentFrame = rect
     }
   }
