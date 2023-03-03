@@ -34,6 +34,10 @@ public struct SwaggerScrollView<Content: View>: View {
     )
   }
   
+  var verticalOverflow: Bool {
+    round(currentContentFrame.height) > round(currentFrame.height)
+  }
+  
   private let coordinateSpaceName = UUID()
   
   var maskEnabled: Bool = false
@@ -50,14 +54,13 @@ public struct SwaggerScrollView<Content: View>: View {
         }
     }
     .coordinateSpace(name: coordinateSpaceName)
-    //    .padding([.top, .bottom], 1) // this will prevent the scrollview to extend under the safe area
     .clipped() // this will prevent the scrollview to extend under the safe area
     .frame(minHeight: 0, maxHeight: currentContentFrame.height)
-    .scrollDisabled(round(currentContentFrame.height) <= round(currentFrame.height))
+    .scrollDisabled(!verticalOverflow)
     .frameChanged(coordinateSpace: .named(coordinateSpaceName)) { rect in
       currentFrame = rect
     }
-    .maskIf(enabled: maskEnabled) {
+    .maskIf(enabled: maskEnabled && verticalOverflow) {
       VStack(spacing: 0) {
         if maskEdges.contains(.top) {
           ZStack {
