@@ -36,38 +36,10 @@ public struct SwaggerScrollView<Content: View>: View {
   
   private let coordinateSpaceName = UUID()
   
-  let length = 100.0
-  let edges: Edge.Set = .vertical
-  
-  let opacityTolerance: CGFloat = 10.0
-  
-  var topOpacity: CGFloat {
-    let value = min(1, max(0, 1 - (offset.y/opacityTolerance)))
-    print("topOpacity: \(value)")
-    return value
-  }
-  
-  var bottomOpacity: CGFloat {
-    let justifiedVerticalOffset = offset.y - (maxOffset.y - opacityTolerance)
-    let fixedVerticalOffset: CGFloat = min(opacityTolerance, max(0, justifiedVerticalOffset))
-    
-    let value = min(1, max(0, (fixedVerticalOffset/opacityTolerance)))
-    print("bottomOpacity: \(value)")
-    return value
-  }
-  
-  var gradient: some View {
-    LinearGradient(
-      gradient: Gradient(
-        stops: [
-          .init(color: .clear, location: 0),
-          .init(color: .black, location: 1.0)
-        ]
-      ),
-      startPoint: .bottom, endPoint: .top
-    )
-    .frame(height: length)
-  }
+  var maskEnabled: Bool = false
+  var maskLength: CGFloat = 100.0
+  var maskTriggerLength: CGFloat = 10.0
+  var maskEdges: Edge.Set = .vertical
   
   public var body: some View {
     ScrollView(axes, showsIndicators: showsIndicators) {
@@ -85,24 +57,24 @@ public struct SwaggerScrollView<Content: View>: View {
     .frameChanged(coordinateSpace: .named(coordinateSpaceName)) { rect in
       currentFrame = rect
     }
-    .mask {
+    .maskIf(enabled: maskEnabled) {
       VStack(spacing: 0) {
-        if edges.contains(.top) {
+        if maskEdges.contains(.top) {
           ZStack {
             gradient
               .scaleEffect(y: -1)
             Color.black
-              .frame(height: length)
+              .frame(height: maskLength)
               .opacity(topOpacity)
           }
         }
         Color.black
           .frame(maxWidth: .infinity, maxHeight: .infinity)
-        if edges.contains(.bottom) {
+        if maskEdges.contains(.bottom) {
           ZStack {
             gradient
             Color.black
-              .frame(height: length)
+              .frame(height: maskLength)
               .opacity(bottomOpacity)
           }
         }
@@ -117,6 +89,49 @@ extension SwaggerScrollView {
     var copy = self
     copy.scrollAction = action
     return copy
+  }
+  
+  
+}
+
+@available(iOS 16.0, *)
+extension SwaggerScrollView {
+  public func fade(edges: Edge.Set = .vertical, length: CGFloat, triggerLength: CGFloat) -> Self {
+    var copy = self
+    copy.maskEnabled = true
+    copy.maskLength = length
+    copy.maskTriggerLength = triggerLength
+    copy.maskEdges = edges
+    
+    return copy
+  }
+  
+  var topOpacity: CGFloat {
+    let value = min(1, max(0, 1 - (offset.y/maskTriggerLength)))
+    print("topOpacity: \(value)")
+    return value
+  }
+  
+  var bottomOpacity: CGFloat {
+    let justifiedVerticalOffset = offset.y - (maxOffset.y - maskTriggerLength)
+    let fixedVerticalOffset: CGFloat = min(maskTriggerLength, max(0, justifiedVerticalOffset))
+    
+    let value = min(1, max(0, (fixedVerticalOffset/maskTriggerLength)))
+    print("bottomOpacity: \(value)")
+    return value
+  }
+  
+  var gradient: some View {
+    LinearGradient(
+      gradient: Gradient(
+        stops: [
+          .init(color: .clear, location: 0),
+          .init(color: .black, location: 1.0)
+        ]
+      ),
+      startPoint: .bottom, endPoint: .top
+    )
+    .frame(height: maskLength)
   }
 }
 
