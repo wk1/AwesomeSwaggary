@@ -45,7 +45,7 @@ public struct SwaggerScrollView<Content: View>: View {
         }
     }
     .coordinateSpace(name: coordinateSpaceName)
-//    .padding([.top, .bottom], 1) // this will prevent the scrollview to extend under the safe area
+    //    .padding([.top, .bottom], 1) // this will prevent the scrollview to extend under the safe area
     .clipped() // this will prevent the scrollview to extend under the safe area
     .frame(minHeight: 0, maxHeight: currentContentFrame.height)
     .scrollDisabled(round(currentContentFrame.height) <= round(currentFrame.height))
@@ -66,6 +66,26 @@ extension SwaggerScrollView {
 
 @available(iOS 16.0, *)
 struct SwaggerScrollView_Previews: PreviewProvider {
+  
+  struct SwaggerScrollViewOffsetDemo: View {
+    
+    @State private var verticalOffset: CGFloat = 0.0
+    @State private var maxVerticalOffset: CGFloat = 0.0
+    
+    var body: some View {
+      SwaggerScrollView {
+        VeganIpsumView.long
+      }
+      .onScroll { offset, maxOffset in
+        verticalOffset = offset.y
+        maxVerticalOffset = maxOffset.y
+      }
+      .background(
+        Color(red: verticalOffset/maxVerticalOffset, green: 0.5, blue: 0.5)
+      )
+    }
+  }
+  
   static var previews: some View {
     SwaggerScrollView {
       VeganIpsumView.long
@@ -82,5 +102,7 @@ struct SwaggerScrollView_Previews: PreviewProvider {
       }
       Spacer(minLength: 700)
     }
+    
+    SwaggerScrollViewOffsetDemo()
   }
 }
