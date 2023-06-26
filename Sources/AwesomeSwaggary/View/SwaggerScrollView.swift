@@ -54,7 +54,6 @@ public struct SwaggerScrollView<Content: View>: View {
         }
     }
     .coordinateSpace(name: coordinateSpaceName)
-    .clipped() // this will prevent the scrollview to extend under the safe area
     .frame(minHeight: 0, maxHeight: currentContentFrame.height)
     .scrollDisabled(!verticalOverflow)
     .frameChanged(coordinateSpace: .named(coordinateSpaceName)) { rect in
@@ -154,6 +153,7 @@ struct SwaggerScrollView_Previews: PreviewProvider {
         verticalOffset = offset.y
         maxVerticalOffset = maxOffset.y
       }
+      .clipped()
       .background(
         Color(red: verticalOffset/maxVerticalOffset, green: 0.5, blue: 0.5)
       )
