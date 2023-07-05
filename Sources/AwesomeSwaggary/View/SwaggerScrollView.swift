@@ -35,7 +35,7 @@ public struct SwaggerScrollView<Content: View>: View {
   }
   
   var verticalOverflow: Bool {
-    currentContentFrame.height >= currentFrame.height
+    round(currentContentFrame.height) > round(currentFrame.height)
   }
   
   private let coordinateSpaceName = UUID()
