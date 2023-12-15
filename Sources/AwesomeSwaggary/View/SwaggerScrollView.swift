@@ -110,7 +110,6 @@ extension SwaggerScrollView {
   
   var topOpacity: CGFloat {
     let value = min(1, max(0, 1 - (offset.y/maskTriggerLength)))
-    print("topOpacity: \(value)")
     return value
   }
   
@@ -119,7 +118,6 @@ extension SwaggerScrollView {
     let fixedVerticalOffset: CGFloat = min(maskTriggerLength, max(0, justifiedVerticalOffset))
     
     let value = min(1, max(0, (fixedVerticalOffset/maskTriggerLength)))
-    print("bottomOpacity: \(value)")
     return value
   }
   
